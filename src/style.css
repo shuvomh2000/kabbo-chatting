@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+/* registration part start */
+.registration{
+    background: #141414;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main_registration{
+    padding: 40px;
+    background: #191919;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.reg_heading{
+    font-size: 36px;
+    color: #A085FF;
+    font-weight: 500;
+    text-align: center;
+    font-family: 'Overpass', sans-serif;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.err{
+    color: red;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    background-color: #313131;
+    background-clip: padding-box;
+    border: none;
+    appearance: none;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+}
+
+.form-control:focus {
+    color: #fff;
+    background-color: #313131;
+    border: none;
+    outline: 0;
+    box-shadow: 0 0 0 0 transparent;
+}
+
+.form-control::placeholder{
+    color: #6c757d;
+} 
+
+.btn{
+    width: 100%;
+    background: #A085FF;
+}
+
+.btn-primary {
+    border-color: transparent;
+    font-size: 18px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.btn:focus{
+    background-color: #8664ff;
+    border: none;
+    box-shadow: 0 0 0 0 transparent;
+}
+
+.btn-primary:hover {
+    background-color: #8664ff;
+    border-color: #8664ff;
+}
+
+.main_registration h3 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: 'DM Sans', sans-serif;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+.main_registration a {
+    color: #A085FF;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: 'Overpass', sans-serif;
+  }
+/* registration part end */
