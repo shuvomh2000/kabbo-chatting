@@ -18,10 +18,13 @@ const Admin = (props) => {
   const handleShow = () => setShow(true);
   let [users, setUsers] = useState([])
   let [requsers, setRequsers] = useState([])
+  let [friends, setFriends] = useState([])
   let [imgselect, setImgselect] = useState('')
   let [loading, setLoading] = useState(false)
   let [updatepicture, setUpdatepicture] = useState('')
-// from database
+
+  
+// log in users
 let userArr = []
       useEffect(()=>{
         const userRef = ref(db, 'users/');
@@ -30,9 +33,9 @@ let userArr = []
              if(props.id !== item.key){
               userArr.push(item.val())
              }
-            //  else{
-            //   setUpdatepicture(item.val().img)
-            // }              
+             else{
+              setUpdatepicture(item.val().img)
+            }              
             })
             setUsers(userArr)
         });
@@ -88,9 +91,8 @@ let handleChangePicture = ()=>{
       receiver: id,
       sender: auth.currentUser.uid,
     });
-    remove(ref(db, 'users/'+id))
   }
-//  request accept
+//  request array
 let reqArr = []
       useEffect(()=>{
         const db = getDatabase();
@@ -100,6 +102,30 @@ let reqArr = []
               reqArr.push(item.val())
             })
             setRequsers(reqArr)
+        });
+ },[])
+
+// request accept
+let handleAceept = (id,name)=>{
+  set(ref(db, 'accept/'+auth.currentUser.uid), {
+    Reqaceepter:auth.currentUser.displayName,
+    username: name,
+    receiver: auth.currentUser.uid,
+    sender: id,
+  });
+  remove(ref(db, 'SendRequests/'+id))
+}
+
+// friend list
+let frndArr = []
+      useEffect(()=>{
+        const db = getDatabase();
+        const userRef = ref(db, 'accept/');
+        onValue(userRef, (snapshot) => {
+            snapshot.forEach(item=>{
+              frndArr.push(item.val())
+            })
+            setFriends(frndArr)
         });
  },[])
 
@@ -145,7 +171,20 @@ let reqArr = []
   <Accordion.Item eventKey="0">
     <Accordion.Header>Friends</Accordion.Header>
     <Accordion.Body>
-      1
+      {friends.map(item=>(
+        <ListGroup>
+        {item.receiver == auth.currentUser.uid
+        ?
+        <ListGroup.Item>{item.username}</ListGroup.Item>
+        :
+        item.sender == auth.currentUser.uid
+        ?
+        <ListGroup.Item>{item.Reqaceepter }</ListGroup.Item>
+        :
+        ""
+        }
+      </ListGroup>
+      ))}
     </Accordion.Body>
   </Accordion.Item>
   <Accordion.Item eventKey="1">
@@ -155,24 +194,17 @@ let reqArr = []
      <ListGroup>
      {item.receiver == auth.currentUser.uid
      ?
-
      <ListGroup.Item>
       <div>
           <img className='list_img'src={props.img}/>{item.username}
           </div>
           <div className='icon_aceept'>
-            <Button>A</Button>
+            <Button onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
             <Button>r</Button>
       </div>
      </ListGroup.Item>
-    
      :
-     item.sender == auth.currentUser.uid
-     
-     ?
-     <ListGroup.Item>{item.reqSenderName}</ListGroup.Item>
-     :
-     ""
+      ''
      }
    </ListGroup>
    ))}

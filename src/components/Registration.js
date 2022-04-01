@@ -72,8 +72,6 @@ const Registration = () => {
                             setLoading(false)
                             navigate("/login",{state:"Account Created Successfully"})
                         })
-
-
                   }).catch((error) => {
                       console.log(error)
                   });
@@ -134,9 +132,7 @@ const Registration = () => {
             sign-up
             </Button>
             }
-           
             <h3>Already have an account? <Link to="/login">Login</Link></h3>
-            
         </Form>
         </div>
         </Container>
