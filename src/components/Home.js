@@ -46,18 +46,6 @@ const Home = () => {
     {/* <ToastContainer/> */}
     <Admin username={name} img={img} id={id}/>
     <Chat/>
-
-    {/* <Row>
-        <Col lg={3}>
-            <Admin/>
-        </Col>
-        <Col lg={6}>
-        <Chat/>
-        </Col>
-        <Col lg={3}>
-        <Other/>
-        </Col>
-    </Row> */}
     </div>
 
     </>

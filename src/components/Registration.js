@@ -49,12 +49,15 @@ const Registration = () => {
             createUserWithEmailAndPassword(auth, email, password)
             .then((user) => {
                 updateProfile(auth.currentUser, {
-                    displayName: username, photoURL: "https://www.alaska.edu/_resources/images/placeholders/profile.png"
+                    displayName: username,
+                    photoURL: "https://www.alaska.edu/_resources/images/placeholders/profile.png"
                   }).then(() => {
                         const db = getDatabase();
                         set(ref(db, 'users/' + auth.currentUser.uid), {
                             username: username,
                             email: email,
+                            id: user.user.uid,
+                            img: user.user.photoURL 
                         }).then(() =>{
                             setUsername('')
                             setErrusername('')
@@ -81,6 +84,7 @@ const Registration = () => {
                 const errorMessage = error.message;
                 if(errorCode.includes("already")){
                     setSameemail("Email Already Use")
+                    setLoading(false)
                 }
             });
         }

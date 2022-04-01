@@ -271,4 +271,33 @@
     color: #fff;
     background-color: #6244d1;
 }
+
+.admin .log_user{
+    display: flex;
+    justify-content: space-between;
+}
+.admin .icon_send{
+    display: flex;
+    justify-content: end;
+}
+.admin .icon_send button{
+    display: flex;
+    justify-content: end;
+    margin-left: 5px;
+}
+
+.admin .list_img{
+    width: 35px;
+    height: 35px;
+    border: 1px solid #6244d1;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+}
+
+.admin .icon_aceept{
+    display: flex;
+}
 /* Admin part end */
