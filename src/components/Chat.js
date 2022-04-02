@@ -1,5 +1,5 @@
 import { Button,Form,Card } from 'react-bootstrap'
-import { getAuth, signOut } from "firebase/auth"
+import { getAuth } from "firebase/auth"
 import React ,{useState,useEffect} from 'react'
 import { getDatabase,ref,set,onValue,remove,push } from "firebase/database";
 import "../firebaseconfig"
@@ -10,6 +10,7 @@ const Chat = () => {
   const auth = getAuth();
   const db = getDatabase()
   let userdata = useSelector(item=>item.activeuser.id)
+  let grpdata = useSelector(item=>item.activegrp.id)
 
   let [msg, setMsg] = useState('')
   let [usermsg, setUsermsg] = useState([])

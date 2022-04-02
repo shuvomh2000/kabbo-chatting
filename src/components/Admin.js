@@ -24,9 +24,11 @@ const Admin = (props) => {
   let [group, setGroup] = useState([])
   let [imgselect, setImgselect] = useState('')
   let [activeuser, setActiveuser] = useState('')
+  let [testing, setTesting] = useState('')
   let [grpname, setGrpname] = useState('')
   let [loading, setLoading] = useState(false)
   let [updatepicture, setUpdatepicture] = useState('')
+  let [test, setTest] = useState('')
 
   
 // log in users
@@ -77,6 +79,7 @@ let handleChangePicture = ()=>{
     }, 
     () => {
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        setTest(downloadURL)
         console.log('File available at', downloadURL);
            set(ref(db, 'users/' + auth.currentUser.uid), {
              username: props.username,
@@ -112,13 +115,13 @@ let reqArr = []
 
 // request accept
 let handleAceept = (id,name)=>{
-  set(ref(db, 'accept/'+auth.currentUser.uid), {
+  set(ref(db, 'accept/'+id), {
     Reqaceepter:auth.currentUser.displayName,
     username: name,
     receiver: auth.currentUser.uid,
     sender: id,
   });
-  // remove(ref(db, 'SendRequests/'+id))
+  remove(ref(db, 'SendRequests/'+id))
 }
 
 // friend list
@@ -149,8 +152,8 @@ let handleGroupName = (e)=>{
  let handleCreateGrp = ()=>{
   setLoading(true)
   set(push(ref(db, 'group/')), {
-    msg: grpname,
-    name: auth.currentUser.displayName,
+    name: grpname,
+    adminName: auth.currentUser.displayName,
     admin: auth.currentUser.uid
   })
     setLoading(false)
@@ -164,11 +167,26 @@ let grpArr = []
         const userRef = ref(db, 'group/');
         onValue(userRef, (snapshot) => {
             snapshot.forEach(item=>{
-              grpArr.push(item.val())
+                grpArr.push(item.val())
+                setTesting(item.key)
             })
             setGroup(grpArr)
         });
  },[])
+
+ // group redux
+let handleActivegrp = (id)=>{
+  dispatch({type:"ACTIVE_GRP", payload:id})
+}
+// group add member
+ let handleGrpaddMember =(id,name)=>{
+  set(ref(db, 'addGrpMember/'+ auth.currentUser.uid), {
+    Reqaceepter:auth.currentUser.displayName,
+    username: name,
+    receiver: auth.currentUser.uid,
+    sender: id,
+  });
+ }
 return (
     <>
     <div className='admin'>
@@ -208,101 +226,122 @@ return (
     </div>
     <div className='add_friend'>
     <Accordion defaultActiveKey={['0']} alwaysOpen>
-  <Accordion.Item eventKey="0">
-    <Accordion.Header>Friends</Accordion.Header>
-    <Accordion.Body>
-      {friends.map(item=>(
-      <ListGroup>
-        {
-        item.receiver == auth.currentUser.uid
-        ?
-        <ListGroup.Item style={activeuser == item.sender ? active:notactive} onClick={()=>handleActive(item.sender)}>{item.username}</ListGroup.Item>
-        :
-        // item.sender == auth.currentUser.uid
-        // ?
-        // <ListGroup.Item style={activeuser == item.id ? active:notactive} onClick={handleActive(item.receiver)}>{item.Reqaceepter}</ListGroup.Item>
-        // :
-        ""
-        }
-      </ListGroup>
-      ))}
-    </Accordion.Body>
-  </Accordion.Item>
-  <Accordion.Item eventKey="1">
-    <Accordion.Header>Friends Request</Accordion.Header>
-    <Accordion.Body>
-   {requsers.map(item=>(
-     <ListGroup>
-     {item.receiver == auth.currentUser.uid
-     ?
-     <ListGroup.Item>
-      <div>
-          <img className='list_img'src={props.img}/>{item.username}
-          </div>
-          <div className='icon_aceept'>
-            <Button onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
-            <Button>r</Button>
-      </div>
-     </ListGroup.Item>
-     :
-      ''
-     }
-   </ListGroup>
-   ))}
-    </Accordion.Body>
-  </Accordion.Item>
-  <Accordion.Item eventKey="2">
-    <Accordion.Header>Add Freind</Accordion.Header>
-    <Accordion.Body>
-    {users.map(item=>(
-       <ListGroup>
-            <ListGroup.Item className="log_user">
-              <div>
-              <img className='list_img'src={props.img}/>{item.username}
-              </div>
-              <div className='icon_send'>
-              <Button onClick={()=>handleSendRequest(item.id,item.username)}>Add</Button>
-              </div>
-            </ListGroup.Item>
-       </ListGroup>     
-    ))}
-    </Accordion.Body>
-  </Accordion.Item>
-  <Accordion.Item eventKey="3">
-    <Accordion.Header>Group</Accordion.Header>
-    <Accordion.Body>
-      <Button onClick={handleShow}>create a new group</Button>
-      {group.map(item=>(
-       <ListGroup>
-         {item.admin == auth.currentUser.uid?
-            <ListGroup.Item className="log_user">
-              <>{item.msg}</>
-            </ListGroup.Item>
-            :""}
-       </ListGroup>     
-    ))}
-     {/*group modal start */}
-     <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>create a new group</Modal.Title>
-            </Modal.Header>
-            <Modal.Body><Form.Control type="text" onChange={handleGroupName}/></Modal.Body>
-            <Modal.Footer>
-            {loading?
-            <Button  onClick={handleCreateGrp}>
-             <Spinner animation="border" variant="light" />
-          </Button>
-            :
-            <Button onClick={handleCreateGrp}>
-                create
-            </Button>
-            }
-            </Modal.Footer>
-     </Modal>
-        {/*group modal end */}
-    </Accordion.Body>
-  </Accordion.Item>
-</Accordion>
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>Friends</Accordion.Header>
+          <Accordion.Body>
+            {friends.map(item=>(
+            <ListGroup>
+              {
+              item.receiver == auth.currentUser.uid
+              ?
+              <ListGroup.Item style={activeuser == item.sender ? active:notactive} onClick={()=>handleActive(item.sender)}>{item.username}</ListGroup.Item>
+              :
+              // item.sender == auth.currentUser.uid
+              // ?
+              // <ListGroup.Item style={activeuser == item.id ? active:notactive} onClick={handleActive(item.receiver)}>{item.Reqaceepter}</ListGroup.Item>
+              // :
+              ""
+              }
+            </ListGroup>
+            ))}
+            {/* group name */}
+            {group.map(item=>(
+            <ListGroup>
+              {item.admin == auth.currentUser.uid?
+                  <ListGroup.Item className="log_user" onClick={()=>handleActivegrp(testing)}>{item.name}</ListGroup.Item>
+                  :""}
+            </ListGroup>     
+          ))}
+            {/* group name */}
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="1">
+          <Accordion.Header>Friends Request</Accordion.Header>
+          <Accordion.Body>
+        {requsers.map(item=>(
+          <ListGroup>
+          {item.receiver == auth.currentUser.uid
+          ?
+          <ListGroup.Item>
+            <div>
+                <img className='list_img'src={props.img}/>{item.username}
+                </div>
+                <div className='icon_aceept'>
+                  <Button onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
+                  <Button>r</Button>
+            </div>
+          </ListGroup.Item>
+          :
+            ''
+          }
+        </ListGroup>
+        ))}
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="2">
+          <Accordion.Header>Add Freind</Accordion.Header>
+          <Accordion.Body>
+          {users.map(item=>(
+            <ListGroup>
+                  <ListGroup.Item className="log_user">
+                    <div>
+                    <img className='list_img'src={props.img}/>{item.username}
+                    </div>
+                    <div className='icon_send'>
+                    <Button onClick={()=>handleSendRequest(item.id,item.username)}>Add</Button>
+                    </div>
+                  </ListGroup.Item>
+            </ListGroup>     
+          ))}
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="3">
+          <Accordion.Header>Group</Accordion.Header>
+          <Accordion.Body>
+            {/*  */}
+            <Form.Control type="text" onChange={handleGroupName} placeholder="write a name"/>
+              <Button onClick={handleCreateGrp}>
+                      create
+              </Button>
+            {/*  */}
+            {group.map(item=>(
+            <ListGroup>
+              {item.admin == auth.currentUser.uid?
+                  <ListGroup>
+                        <ListGroup.Item className="log_user">
+                          {/* <div>
+                          <img className='list_img'src={props.img}/>
+                          {item.name}
+                          </div> */}
+                          <div className='icon_send'>
+                          {/* <Button>Add Member</Button> */}
+                          <Accordion>
+                              <Accordion.Item eventKey="0">
+                                <Accordion.Header>{item.name}</Accordion.Header>
+                                <Accordion.Body>
+                                {friends.map(item=>(
+                                      <ListGroup>
+                                        {
+                                        item.receiver == auth.currentUser.uid
+                                        ?
+                                        <ListGroup.Item>{item.username}<Button onClick={()=>handleGrpaddMember(item.id,item.username)}>+</Button></ListGroup.Item>
+                                        :
+                                        ""
+                                        }
+                                      </ListGroup>
+                                      ))}
+                                </Accordion.Body>
+                              </Accordion.Item>
+                            </Accordion>
+                          </div>
+                        </ListGroup.Item>
+                  </ListGroup>
+                  :""}
+            </ListGroup>     
+          ))}
+          </Accordion.Body>
+        </Accordion.Item>
+    </Accordion>
     </div>
     </div>
     </>

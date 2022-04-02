@@ -5,6 +5,7 @@
 .home{
     display: flex;
     flex-wrap: wrap;
+    overflow: hidden;
 }
 /* registration part start */
 .registration{
@@ -190,8 +191,8 @@
 }
 
 .admin_profile .profile_img {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -299,6 +300,12 @@
 
 .admin .icon_aceept{
     display: flex;
+}
+
+.admin .accordion-body {
+    padding: 0;
+    height: 200px;
+    overflow-y: scroll;
 }
 /* Admin part end */
 /* chat part start */

@@ -12,8 +12,17 @@ const userreducer = (state = initialState,action)=>{
     }
 }
 
+const grpreducer = (state = initialState,action)=>{
+    if(action.type == 'ACTIVE_GRP'){
+        return {...state,id:action.payload}
+    }else{
+        return state
+    }
+}
+
 const rootReducer = combineReducers({
-    activeuser: userreducer
+    activeuser: userreducer,
+    activegrp:grpreducer
 })
 
 export default rootReducer
