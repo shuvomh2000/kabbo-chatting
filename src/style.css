@@ -301,3 +301,34 @@
     display: flex;
 }
 /* Admin part end */
+/* chat part start */
+.Chat{
+    position: relative;
+}
+
+.footer{
+    position: absolute;
+    width: 100%;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+}
+.footer .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    background: #382e59;
+    border: 1px solid #382e59;
+    margin-right: 10px;
+}
+.footer .file_input {
+    width: 90%;
+    border: 1px solid #8664ff;
+    background: #8664ff;
+}
+
+/* chat part end */

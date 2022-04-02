@@ -4,13 +4,15 @@ import { Dropdown,Modal,Button,Form,Spinner,Accordion,ListGroup } from 'react-bo
 import { getAuth, signOut } from "firebase/auth"
 import "../firebaseconfig"
 import { getStorage, ref as refer, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getDatabase,ref,set,onValue,remove } from "firebase/database";
+import { getDatabase,ref,set,onValue,remove,push } from "firebase/database";
+import { useDispatch } from 'react-redux'
 
 
 
 const Admin = (props) => {
   const auth = getAuth();
   const db = getDatabase();
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const storage = getStorage();
   const [show, setShow] = useState(false);
@@ -19,7 +21,10 @@ const Admin = (props) => {
   let [users, setUsers] = useState([])
   let [requsers, setRequsers] = useState([])
   let [friends, setFriends] = useState([])
+  let [group, setGroup] = useState([])
   let [imgselect, setImgselect] = useState('')
+  let [activeuser, setActiveuser] = useState('')
+  let [grpname, setGrpname] = useState('')
   let [loading, setLoading] = useState(false)
   let [updatepicture, setUpdatepicture] = useState('')
 
@@ -113,7 +118,7 @@ let handleAceept = (id,name)=>{
     receiver: auth.currentUser.uid,
     sender: id,
   });
-  remove(ref(db, 'SendRequests/'+id))
+  // remove(ref(db, 'SendRequests/'+id))
 }
 
 // friend list
@@ -129,7 +134,42 @@ let frndArr = []
         });
  },[])
 
-  return (
+// redux
+let handleActive = (id)=>{
+  setActiveuser(id)
+  dispatch({type:"ACTIVE_USER", payload:id})
+}
+
+// group name
+let handleGroupName = (e)=>{
+  setGrpname(e.target.value)
+}
+
+// create new grp
+ let handleCreateGrp = ()=>{
+  setLoading(true)
+  set(push(ref(db, 'group/')), {
+    msg: grpname,
+    name: auth.currentUser.displayName,
+    admin: auth.currentUser.uid
+  })
+    setLoading(false)
+    setShow(false)
+ }
+
+//  group array
+let grpArr = []
+      useEffect(()=>{
+        const db = getDatabase();
+        const userRef = ref(db, 'group/');
+        onValue(userRef, (snapshot) => {
+            snapshot.forEach(item=>{
+              grpArr.push(item.val())
+            })
+            setGroup(grpArr)
+        });
+ },[])
+return (
     <>
     <div className='admin'>
     <div className='admin_profile'>
@@ -172,15 +212,16 @@ let frndArr = []
     <Accordion.Header>Friends</Accordion.Header>
     <Accordion.Body>
       {friends.map(item=>(
-        <ListGroup>
-        {item.receiver == auth.currentUser.uid
+      <ListGroup>
+        {
+        item.receiver == auth.currentUser.uid
         ?
-        <ListGroup.Item>{item.username}</ListGroup.Item>
+        <ListGroup.Item style={activeuser == item.sender ? active:notactive} onClick={()=>handleActive(item.sender)}>{item.username}</ListGroup.Item>
         :
-        item.sender == auth.currentUser.uid
-        ?
-        <ListGroup.Item>{item.Reqaceepter }</ListGroup.Item>
-        :
+        // item.sender == auth.currentUser.uid
+        // ?
+        // <ListGroup.Item style={activeuser == item.id ? active:notactive} onClick={handleActive(item.receiver)}>{item.Reqaceepter}</ListGroup.Item>
+        // :
         ""
         }
       </ListGroup>
@@ -230,7 +271,35 @@ let frndArr = []
   <Accordion.Item eventKey="3">
     <Accordion.Header>Group</Accordion.Header>
     <Accordion.Body>
-
+      <Button onClick={handleShow}>create a new group</Button>
+      {group.map(item=>(
+       <ListGroup>
+         {item.admin == auth.currentUser.uid?
+            <ListGroup.Item className="log_user">
+              <>{item.msg}</>
+            </ListGroup.Item>
+            :""}
+       </ListGroup>     
+    ))}
+     {/*group modal start */}
+     <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>create a new group</Modal.Title>
+            </Modal.Header>
+            <Modal.Body><Form.Control type="text" onChange={handleGroupName}/></Modal.Body>
+            <Modal.Footer>
+            {loading?
+            <Button  onClick={handleCreateGrp}>
+             <Spinner animation="border" variant="light" />
+          </Button>
+            :
+            <Button onClick={handleCreateGrp}>
+                create
+            </Button>
+            }
+            </Modal.Footer>
+     </Modal>
+        {/*group modal end */}
     </Accordion.Body>
   </Accordion.Item>
 </Accordion>
