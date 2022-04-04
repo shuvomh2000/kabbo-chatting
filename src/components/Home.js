@@ -44,7 +44,7 @@ const Home = () => {
     <>
     <div className='home'>
     {/* <ToastContainer/> */}
-    <Admin username={name} img={img} id={id}/>
+    <Admin username={name} email={email} img={img} id={id}/>
     <Chat/>
     </div>
 

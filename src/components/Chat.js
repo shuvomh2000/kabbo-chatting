@@ -14,7 +14,8 @@ const Chat = () => {
 
   let [msg, setMsg] = useState('')
   let [usermsg, setUsermsg] = useState([])
-  let [automsgsend,setAutomsgsend] = useState(false)
+  let [grpmsg, setGrpmsg] = useState([])
+  // let [automsgsend,setAutomsgsend] = useState(false)
 
 
   // input target
@@ -29,7 +30,7 @@ const Chat = () => {
       receiver: userdata,
       sender: auth.currentUser.uid
   })
-  setAutomsgsend(!automsgsend) 
+  // setAutomsgsend(!automsgsend) 
   setMsg('')
   }
   
@@ -41,10 +42,26 @@ const Chat = () => {
     onValue(userRef, (snapshot) => {
     snapshot.forEach(item=>{
       msgArr.push(item.val())
+      console.log(item)
     })
     setUsermsg(msgArr)
     })
     },[userdata])
+
+
+  // group massage In
+  let grpmsgArr = []
+  useEffect (()=>{
+    const db = getDatabase();
+    const userRef = ref(db, 'messages/');
+    onValue(userRef, (snapshot) => {
+    snapshot.forEach(item=>{
+      grpmsgArr.push(item.val())
+      console.log(item.val())
+    })
+    setGrpmsg(grpmsgArr)
+    })
+    },[grpdata])
 
 
   return (
@@ -64,6 +81,20 @@ const Chat = () => {
    :
    ''
    ))}
+    {/* {grpmsg.map(item=>(
+      item.key == grpdata
+     ?
+     <Card style={item.sender == auth.currentUser.uid?receiver:sender}>
+     <Card.Body>
+       <Card.Title>{item.name}</Card.Title>
+       <Card.Text>
+         {item.msg}
+       </Card.Text>
+     </Card.Body>
+   </Card>
+   :
+   ''
+   ))} */}
     <div className='footer'>
       <Button onClick={handleSendMsg}  className='file_btn'>fi</Button>
       <Form.Control onChange={handleMsg} className='file_input' type="text" placeholder=" write a massage" value={msg} />

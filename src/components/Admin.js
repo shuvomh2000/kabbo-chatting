@@ -4,12 +4,14 @@ import { Dropdown,Modal,Button,Form,Spinner,Accordion,ListGroup } from 'react-bo
 import { getAuth, signOut } from "firebase/auth"
 import "../firebaseconfig"
 import { getStorage, ref as refer, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getDatabase,ref,set,onValue,remove,push } from "firebase/database";
+import { getDatabase,ref,set,onValue,remove,push,child,get } from "firebase/database";
 import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux';
 
 
 
 const Admin = (props) => {
+  let grpdata = useSelector(item=>item.activegrp.id)
   const auth = getAuth();
   const db = getDatabase();
   const dispatch = useDispatch()
@@ -22,14 +24,22 @@ const Admin = (props) => {
   let [requsers, setRequsers] = useState([])
   let [friends, setFriends] = useState([])
   let [group, setGroup] = useState([])
+  let [picupload, setPicupload] = useState('')
   let [imgselect, setImgselect] = useState('')
   let [activeuser, setActiveuser] = useState('')
   let [testing, setTesting] = useState('')
   let [grpname, setGrpname] = useState('')
   let [loading, setLoading] = useState(false)
-  let [updatepicture, setUpdatepicture] = useState('')
-  let [test, setTest] = useState('')
+  
 
+  // logout
+  let handleLogout = ()=>{
+    signOut(auth).then(() => {
+      navigate("/Login")
+    }).catch((error) => {
+     console.log(error)
+    });
+  }
   
 // log in users
 let userArr = []
@@ -41,45 +51,35 @@ let userArr = []
               userArr.push(item.val())
              }
              else{
-              setUpdatepicture(item.val().img)
+              setImgselect(item.val().img)
             }              
             })
             setUsers(userArr)
         });
       },[props.id])
 
-// logout
-  let handleLogout = ()=>{
-    signOut(auth).then(() => {
-      navigate("/Login")
-    }).catch((error) => {
-     console.log(error)
-    });
-  }
+
 // profile picture change
 let handleUploadPicture = (e)=>{
-  setImgselect(e.target.files[0])
+  setPicupload(e.target.files[0])
 }
 // profile picture upload for chaging
 let handleChangePicture = ()=>{
     setLoading(true)
-  const storageRef = refer(storage, `adminPicture${imgselect.name}`);
-  const uploadTask = uploadBytesResumable(storageRef, imgselect);
+  const storageRef = refer(storage, `userprofile/${auth.currentUser.uid}/${picupload.name}`);
+  const uploadTask = uploadBytesResumable(storageRef, picupload);
   uploadTask.on('state_changed', 
     (snapshot) => {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       console.log('Upload is ' + progress + '% done');
-    if(progress == 100){
-        setShow(false)
-        setLoading(false)
-    }
+      setShow(false)
+      // setLoading(false)
     }, 
     (error) => {
       console.log(error)
     }, 
     () => {
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        setTest(downloadURL)
         console.log('File available at', downloadURL);
            set(ref(db, 'users/' + auth.currentUser.uid), {
              username: props.username,
@@ -152,7 +152,7 @@ let handleGroupName = (e)=>{
  let handleCreateGrp = ()=>{
   setLoading(true)
   set(push(ref(db, 'group/')), {
-    name: grpname,
+    grpName: grpname,
     adminName: auth.currentUser.displayName,
     admin: auth.currentUser.uid
   })
@@ -168,7 +168,14 @@ let grpArr = []
         onValue(userRef, (snapshot) => {
             snapshot.forEach(item=>{
                 grpArr.push(item.val())
-                setTesting(item.key)
+                let grpinfo ={
+                  id:item.key,
+                  groupname:item.val().grpName,
+                  adminName:item.val().adminName,
+                  adminID:item.val().admin,
+                }
+                grpArr.push(grpinfo)
+                setTesting(grpinfo)
             })
             setGroup(grpArr)
         });
@@ -180,18 +187,19 @@ let handleActivegrp = (id)=>{
 }
 // group add member
  let handleGrpaddMember =(id,name)=>{
-  set(ref(db, 'addGrpMember/'+ auth.currentUser.uid), {
-    Reqaceepter:auth.currentUser.displayName,
-    username: name,
-    receiver: auth.currentUser.uid,
-    sender: id,
-  });
+  set(ref(db, `group/${grpdata.id}`),{
+    id:id,
+    name:name,
+    grpName: grpname,
+    adminName: auth.currentUser.displayName,
+    admin: auth.currentUser.uid
+  })
  }
 return (
     <>
     <div className='admin'>
     <div className='admin_profile'>
-    <img className='profile_img'src={props.img}/>
+    <img className='profile_img'src={imgselect}/>
     <Dropdown>
       <Dropdown.Toggle variant="success" id="dropdown-basic">
         {props.username}
@@ -207,9 +215,9 @@ return (
             <Modal.Body><Form.Control type="file" onChange={handleUploadPicture}/></Modal.Body>
             <Modal.Footer>
             {loading?
-            <Button variant="primary" onClick={handleChangePicture}>
-             <Spinner animation="border" variant="light" />
-          </Button>
+            <Button variant="primary">
+              <Spinner animation="border" variant="light" />
+            </Button>
             :
             <Button variant="primary" onClick={handleChangePicture}>
                 Upload
@@ -221,34 +229,31 @@ return (
       </Dropdown.Menu>
     </Dropdown>
     </div>
-    <div className='acas'>
-
-    </div>
     <div className='add_friend'>
     <Accordion defaultActiveKey={['0']} alwaysOpen>
         <Accordion.Item eventKey="0">
           <Accordion.Header>Friends</Accordion.Header>
           <Accordion.Body>
             {friends.map(item=>(
-            <ListGroup>
+            <ListGroup className='friends'>
               {
               item.receiver == auth.currentUser.uid
               ?
-              <ListGroup.Item style={activeuser == item.sender ? active:notactive} onClick={()=>handleActive(item.sender)}>{item.username}</ListGroup.Item>
+              <ListGroup.Item  style={activeuser == item.sender ? active:notactive} onClick={()=>handleActive(item.sender)}>{item.username}</ListGroup.Item>
               :
-              // item.sender == auth.currentUser.uid
-              // ?
-              // <ListGroup.Item style={activeuser == item.id ? active:notactive} onClick={handleActive(item.receiver)}>{item.Reqaceepter}</ListGroup.Item>
-              // :
+              item.sender == auth.currentUser.uid
+              ?
+              <ListGroup.Item style={activeuser == item.id ? active:notactive} onClick={()=>handleActive(item.receiver)}>{item.Reqaceepter}</ListGroup.Item>
+              :
               ""
               }
             </ListGroup>
             ))}
             {/* group name */}
             {group.map(item=>(
-            <ListGroup>
+            <ListGroup className='friends'>
               {item.admin == auth.currentUser.uid?
-                  <ListGroup.Item className="log_user" onClick={()=>handleActivegrp(testing)}>{item.name}</ListGroup.Item>
+                  <ListGroup.Item className="log_user" onClick={()=>handleActivegrp(testing)}>{item.grpName}</ListGroup.Item>
                   :""}
             </ListGroup>     
           ))}
@@ -259,16 +264,16 @@ return (
           <Accordion.Header>Friends Request</Accordion.Header>
           <Accordion.Body>
         {requsers.map(item=>(
-          <ListGroup>
+          <ListGroup className='friends_req'>
           {item.receiver == auth.currentUser.uid
           ?
-          <ListGroup.Item>
+          <ListGroup.Item className='d-flex justify-content-between'>
             <div>
                 <img className='list_img'src={props.img}/>{item.username}
-                </div>
-                <div className='icon_aceept'>
-                  <Button onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
-                  <Button>r</Button>
+            </div>
+            <div className='icon_aceept'>
+                  <Button style={{background:"green"}} onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
+                  <Button style={{background:"red"}}>r</Button>
             </div>
           </ListGroup.Item>
           :
@@ -282,7 +287,7 @@ return (
           <Accordion.Header>Add Freind</Accordion.Header>
           <Accordion.Body>
           {users.map(item=>(
-            <ListGroup>
+            <ListGroup className='add_friends'>
                   <ListGroup.Item className="log_user">
                     <div>
                     <img className='list_img'src={props.img}/>{item.username}
@@ -295,36 +300,37 @@ return (
           ))}
           </Accordion.Body>
         </Accordion.Item>
-        <Accordion.Item eventKey="3">
+        <Accordion.Item eventKey="3" className="group">
           <Accordion.Header>Group</Accordion.Header>
           <Accordion.Body>
             {/*  */}
+            <div  className='d-flex'>
             <Form.Control type="text" onChange={handleGroupName} placeholder="write a name"/>
-              <Button onClick={handleCreateGrp}>
-                      create
+              <Button style={{width:"18%"}} onClick={handleCreateGrp}>
+                      ok
               </Button>
+            </div>
             {/*  */}
             {group.map(item=>(
             <ListGroup>
               {item.admin == auth.currentUser.uid?
                   <ListGroup>
-                        <ListGroup.Item className="log_user">
-                          {/* <div>
-                          <img className='list_img'src={props.img}/>
-                          {item.name}
-                          </div> */}
+                        <ListGroup.Item>
                           <div className='icon_send'>
-                          {/* <Button>Add Member</Button> */}
+                          {/* inner accordion */}
                           <Accordion>
                               <Accordion.Item eventKey="0">
-                                <Accordion.Header>{item.name}</Accordion.Header>
+                                <Accordion.Header>{item.grpName}</Accordion.Header>
                                 <Accordion.Body>
                                 {friends.map(item=>(
                                       <ListGroup>
                                         {
                                         item.receiver == auth.currentUser.uid
                                         ?
-                                        <ListGroup.Item>{item.username}<Button onClick={()=>handleGrpaddMember(item.id,item.username)}>+</Button></ListGroup.Item>
+                                       <div className='d-flex justify-content-around'>
+                                         <ListGroup.Item>{item.username}</ListGroup.Item>
+                                         <Button className="w-25" onClick={()=>handleGrpaddMember(item.sender,item.username)}>+</Button>
+                                       </div>
                                         :
                                         ""
                                         }
@@ -333,6 +339,7 @@ return (
                                 </Accordion.Body>
                               </Accordion.Item>
                             </Accordion>
+                          {/* inner accordion */}
                           </div>
                         </ListGroup.Item>
                   </ListGroup>

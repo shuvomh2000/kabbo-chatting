@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
-
+*{
+    box-shadow: none !important;
+}
 .home{
     display: flex;
     flex-wrap: wrap;
@@ -201,6 +203,80 @@
     margin: 20px 0 10px 0;
 }
 
+.admin .accordion{
+    margin: 10px auto 0 auto;
+    width: 80%;
+}
+
+.admin .accordion-button {
+    padding: 8px 15px;
+    font-size: 16px;
+    color: #382e59;
+    font-weight: 700;
+    font-family: 'Overpass', sans-serif;
+    background-color: #fff;
+    text-transform: capitalize;
+}
+
+.admin .accordion-body {
+    padding: 0;
+    min-height: 0px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.admin .group .accordion-body{
+    padding: 0;
+}
+
+.admin .accordion-body .friends .list-group-item {
+    padding: 5px 10px 5px 20px;
+    color: #6244d1 !important;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.125);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Overpass', sans-serif;
+    text-transform: capitalize;
+}
+
+.admin .accordion-body .friends_req .list-group-item,
+.admin .accordion-body .add_friends .list-group-item{
+    padding: 5px 10px 5px 20px;
+    color: #6244d1 !important;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.125);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Overpass', sans-serif;
+    text-transform: capitalize;
+    line-height: 35px;
+}
+.admin .accordion-body .friends_req .list-group-item img,
+.admin .accordion-body .add_friends .list-group-item img{
+    margin-right: 5px;
+}
+
+.admin .accordion-body .friends_req Button{
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    line-height: 25px;
+    padding: 0;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.admin .accordion-body .add_friends Button{
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    line-height: 25px;
+    padding: 0;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
 .admin_profile .btn-success {
     color: #fff;
     background-color: #4E38A1;
@@ -244,6 +320,12 @@
     -o-border-radius: 10px;
     overflow: hidden;
 }
+.admin_profile .dropdown .btn {
+    font-size: 17px;
+    font-weight: 500;
+    font-family: 'Overpass', sans-serif;
+    text-transform: capitalize;
+}
 
 .admin_profile element.style {
 	position: absolute;
@@ -273,17 +355,11 @@
     background-color: #6244d1;
 }
 
-.admin .log_user{
-    display: flex;
-    justify-content: space-between;
-}
 .admin .icon_send{
     display: flex;
     justify-content: end;
 }
 .admin .icon_send button{
-    display: flex;
-    justify-content: end;
     margin-left: 5px;
 }
 
@@ -302,11 +378,43 @@
     display: flex;
 }
 
-.admin .accordion-body {
+.admin .group .accordion-body{
+    min-height: 0;
+    max-height: 300px;
     padding: 0;
-    height: 200px;
-    overflow-y: scroll;
 }
+
+.admin .group .accordion-body input{
+    width: 80%;
+    margin-right:auto;
+    color: #382e59;
+}
+
+.admin .group .accordion-body  .form-control:focus{
+    background: rgba(160,133,255,.2);
+}
+
+.admin .group .accordion{
+    width: 90%;
+    overflow-x: hidden;
+    padding: 0;
+}
+
+.admin .group .accordion-body .list-group-item {
+    margin: 5px 0 0 0;
+    padding: 0;
+    border: none;
+    color: #6244d1;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Overpass', sans-serif;
+    text-transform: capitalize;
+}
+
+.admin .group .accordion-body .list-group{
+    margin-bottom: 5px;
+}
+
 /* Admin part end */
 /* chat part start */
 .Chat{
