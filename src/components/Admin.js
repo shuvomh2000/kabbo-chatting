@@ -20,6 +20,7 @@ const Admin = (props) => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
   let [users, setUsers] = useState([])
   let [requsers, setRequsers] = useState([])
   let [friends, setFriends] = useState([])
@@ -27,7 +28,8 @@ const Admin = (props) => {
   let [picupload, setPicupload] = useState('')
   let [imgselect, setImgselect] = useState('')
   let [activeuser, setActiveuser] = useState('')
-  let [testing, setTesting] = useState('')
+  let [activeusergrp, setActiveusergrp] = useState('')
+  let [activegrp, setActivegrp] = useState('')
   let [grpname, setGrpname] = useState('')
   let [loading, setLoading] = useState(false)
   
@@ -167,6 +169,7 @@ let grpArr = []
         const userRef = ref(db, 'group/');
         onValue(userRef, (snapshot) => {
             snapshot.forEach(item=>{
+              console.log(item.val())
                 grpArr.push(item.val())
                 let grpinfo ={
                   id:item.key,
@@ -175,7 +178,7 @@ let grpArr = []
                   adminID:item.val().admin,
                 }
                 grpArr.push(grpinfo)
-                setTesting(grpinfo)
+                setActivegrp(grpinfo)
             })
             setGroup(grpArr)
         });
@@ -183,16 +186,14 @@ let grpArr = []
 
  // group redux
 let handleActivegrp = (id)=>{
+  setActiveusergrp(id)
   dispatch({type:"ACTIVE_GRP", payload:id})
 }
 // group add member
  let handleGrpaddMember =(id,name)=>{
-  set(ref(db, `group/${grpdata.id}`),{
+  set(ref(db, `group/${grpdata.id}/${id}`),{
     id:id,
     name:name,
-    grpName: grpname,
-    adminName: auth.currentUser.displayName,
-    admin: auth.currentUser.uid
   })
  }
 return (
@@ -252,9 +253,16 @@ return (
             {/* group name */}
             {group.map(item=>(
             <ListGroup className='friends'>
-              {item.admin == auth.currentUser.uid?
-                  <ListGroup.Item className="log_user" onClick={()=>handleActivegrp(testing)}>{item.grpName}</ListGroup.Item>
-                  :""}
+              { item.admin == auth.currentUser.uid
+              ?
+                  <ListGroup.Item style={activeusergrp == item.id ? active:notactive} onClick={()=>handleActivegrp(activegrp)}>{item.grpName}</ListGroup.Item>
+              :
+               item.id == auth.currentUser.uid
+              ?
+                  <ListGroup.Item style={activeusergrp == item.admin ? active:notactive} onClick={()=>handleActivegrp(activegrp)}>{item.grpName}</ListGroup.Item>
+              :
+              ''
+               }
             </ListGroup>     
           ))}
             {/* group name */}
@@ -288,7 +296,7 @@ return (
           <Accordion.Body>
           {users.map(item=>(
             <ListGroup className='add_friends'>
-                  <ListGroup.Item className="log_user">
+                  <ListGroup.Item className="d-flex justify-content-between">
                     <div>
                     <img className='list_img'src={props.img}/>{item.username}
                     </div>
@@ -320,19 +328,26 @@ return (
                           {/* inner accordion */}
                           <Accordion>
                               <Accordion.Item eventKey="0">
-                                <Accordion.Header>{item.grpName}</Accordion.Header>
+                                <Accordion.Header onClick={()=>handleActivegrp(activegrp)}>{item.grpName}</Accordion.Header>
                                 <Accordion.Body>
                                 {friends.map(item=>(
                                       <ListGroup>
                                         {
-                                        item.receiver == auth.currentUser.uid
+                                        item.receiver == auth.currentUser.uid 
                                         ?
-                                       <div className='d-flex justify-content-around'>
-                                         <ListGroup.Item>{item.username}</ListGroup.Item>
-                                         <Button className="w-25" onClick={()=>handleGrpaddMember(item.sender,item.username)}>+</Button>
-                                       </div>
+                                          <div className='d-flex justify-content-around'>
+                                            <ListGroup.Item>{item.username}</ListGroup.Item>
+                                            <Button className="w-25" onClick={()=>handleGrpaddMember(item.sender,item.username)}>+</Button>
+                                          </div>
                                         :
-                                        ""
+                                        item.sender == auth.currentUser.uid
+                                        ?
+                                            <div className='d-flex justify-content-around'>
+                                              <ListGroup.Item>{item.Reqaceepter}</ListGroup.Item>
+                                              <Button className="w-25" onClick={()=>handleGrpaddMember(item.receiver,item.Reqaceepter)}>+</Button>
+                                            </div>
+                                        :
+                                        ''
                                         }
                                       </ListGroup>
                                       ))}

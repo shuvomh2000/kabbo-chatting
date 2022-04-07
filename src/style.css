@@ -355,10 +355,7 @@
     background-color: #6244d1;
 }
 
-.admin .icon_send{
-    display: flex;
-    justify-content: end;
-}
+
 .admin .icon_send button{
     margin-left: 5px;
 }

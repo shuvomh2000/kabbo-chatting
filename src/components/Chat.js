@@ -22,8 +22,10 @@ const Chat = () => {
   let handleMsg = (e)=>{
     setMsg(e.target.value)
   }
+
   // massage send(out)
-  let handleSendMsg = ()=>{
+  let handleSendMsg = (e)=>{
+    console.log(e)
     set(push(ref(db, 'messages/')), {
       msg: msg,
       name: auth.currentUser.displayName,
@@ -42,7 +44,6 @@ const Chat = () => {
     onValue(userRef, (snapshot) => {
     snapshot.forEach(item=>{
       msgArr.push(item.val())
-      console.log(item)
     })
     setUsermsg(msgArr)
     })
@@ -57,7 +58,6 @@ const Chat = () => {
     onValue(userRef, (snapshot) => {
     snapshot.forEach(item=>{
       grpmsgArr.push(item.val())
-      console.log(item.val())
     })
     setGrpmsg(grpmsgArr)
     })
@@ -81,10 +81,10 @@ const Chat = () => {
    :
    ''
    ))}
-    {/* {grpmsg.map(item=>(
-      item.key == grpdata
+    {grpmsg.map(item=>(
+      item.id == auth.currentUser.uid || item.admin == auth.currentUser.uid
      ?
-     <Card style={item.sender == auth.currentUser.uid?receiver:sender}>
+     <Card style={item.admin == auth.currentUser.uid?receiver:sender}>
      <Card.Body>
        <Card.Title>{item.name}</Card.Title>
        <Card.Text>
@@ -94,9 +94,9 @@ const Chat = () => {
    </Card>
    :
    ''
-   ))} */}
+   ))}
     <div className='footer'>
-      <Button onClick={handleSendMsg}  className='file_btn'>fi</Button>
+      <Button onClick={handleSendMsg}  className='file_btn'>s</Button>
       <Form.Control onChange={handleMsg} className='file_input' type="text" placeholder=" write a massage" value={msg} />
     </div>
     </div>
@@ -105,7 +105,7 @@ const Chat = () => {
 }
 
 let sender = {
-  width: "300px",
+  width: "400px",
   marginRight: "auto",
 }
 
