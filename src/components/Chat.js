@@ -6,6 +6,7 @@ import "../firebaseconfig"
 import { useSelector } from 'react-redux';
 
 
+
 const Chat = () => {
   const auth = getAuth();
   const db = getDatabase()
@@ -96,7 +97,9 @@ const Chat = () => {
    ''
    ))}
     <div className='footer'>
-      <Button onClick={handleSendMsg}  className='file_btn'>s</Button>
+      <Button onClick={handleSendMsg}  className='file_btn'>
+      s
+      </Button>
       <Form.Control onChange={handleMsg} className='file_input' type="text" placeholder=" write a massage" value={msg} />
     </div>
     </div>

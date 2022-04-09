@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 
 
 
+
 const Admin = (props) => {
   let grpdata = useSelector(item=>item.activegrp.id)
   const auth = getAuth();
@@ -18,8 +19,11 @@ const Admin = (props) => {
   const navigate = useNavigate()
   const storage = getStorage();
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleClose2 = () => setShow2(false);
+  const handleShow2 = () => setShow2(true);
 
   let [users, setUsers] = useState([])
   let [requsers, setRequsers] = useState([])
@@ -277,7 +281,7 @@ return (
           ?
           <ListGroup.Item className='d-flex justify-content-between'>
             <div>
-                <img className='list_img'src={props.img}/>{item.username}
+                <img className='list_img'src={imgselect}/>{item.username}
             </div>
             <div className='icon_aceept'>
                   <Button style={{background:"green"}} onClick={()=>handleAceept(item.sender,item.username)}>A</Button>
@@ -298,7 +302,7 @@ return (
             <ListGroup className='add_friends'>
                   <ListGroup.Item className="d-flex justify-content-between">
                     <div>
-                    <img className='list_img'src={props.img}/>{item.username}
+                    <img className='list_img'src={imgselect}/>{item.username}
                     </div>
                     <div className='icon_send'>
                     <Button onClick={()=>handleSendRequest(item.id,item.username)}>Add</Button>
@@ -318,6 +322,24 @@ return (
                       ok
               </Button>
             </div>
+            <Button variant="primary" onClick={handleShow2}>
+        Launch demo modal
+      </Button>
+
+            <Modal show={show2} onHide={handleClose2}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modal headingbgfbngfng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose2}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleClose2}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
             {/*  */}
             {group.map(item=>(
             <ListGroup>
